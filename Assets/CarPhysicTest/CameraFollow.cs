@@ -18,6 +18,19 @@ namespace CameraUI {
 
         Vector3 moveVelocity; //Veclocity of camera
 
+        public Transform Player
+        {
+            get
+            {
+                return player;
+            }
+
+            set
+            {
+                player = value;
+            }
+        }
+
         void FixedUpdate(){
             Move ();
 	    }
