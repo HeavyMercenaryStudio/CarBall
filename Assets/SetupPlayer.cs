@@ -12,6 +12,7 @@ public class SetupPlayer : NetworkBehaviour {
 	void Start () {
         if (!isLocalPlayer)
             return;
+
         camera = GameObject.Find("CameraArm");
         cf = camera.GetComponent<CameraUI.CameraFollow>();
         cf.Player = this.transform;

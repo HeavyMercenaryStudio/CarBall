@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class CarController : MonoBehaviour {
+public class CarController : NetworkBehaviour {
 
     [SerializeField] float maxBoost;
     [SerializeField] float carSpeed;
@@ -30,7 +31,7 @@ public class CarController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         rigibody = GetComponent<Rigidbody>();
-        UI = GetComponent<CarUI>();
+        UI = FindObjectOfType<CarUI>();
 
         currentBoost = maxBoost;
         currentCarSpeed = carSpeed;
@@ -86,6 +87,21 @@ public class CarController : MonoBehaviour {
             var force = transform.forward * kickForce;
             ball.AddForce(force);
             ball.AddTorque(force);
+            CmdHitBall(force, ball.gameObject);
         }
+    }
+
+    [Command]
+    void CmdHitBall(Vector3 force, GameObject ball)
+    {
+        rigibody.AddForce(force);
+        RpcAddForceOnAll(ball, force);
+
+    }
+    [ClientRpc]
+    void RpcAddForceOnAll(GameObject go, Vector3 force)
+    {
+        go.GetComponent<Rigidbody>().AddForce(force);
+
     }
 }
