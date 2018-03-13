@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class GameUI : MonoBehaviour {
+public class GameUI : NetworkBehaviour {
 
     [Header("Time")]
     [SerializeField] Text matchTime;
@@ -22,9 +23,25 @@ public class GameUI : MonoBehaviour {
     public void SetMatchTime(int minutes, int seconds)
     {
         matchTime.text = minutes.ToString() + " : " + seconds.ToString();
+        RpcSetTime(minutes, seconds);
+    }
+    [ClientRpc]
+    void RpcSetTime(int minutes, int seconds)
+    {
+        matchTime.text = minutes.ToString() + " : " + seconds.ToString();
     }
 
     public void SetTeamScore(int score, int team)
+    {
+        if (team == 1)
+            firstTeamScoreText.text = score.ToString();
+        else if(team == 2)
+            secondTeamScoreText.text = score.ToString();
+
+        RpcSetTeamScore(score, team);
+    }
+    [ClientRpc]
+    void RpcSetTeamScore(int score, int team)
     {
         if (team == 1) firstTeamScoreText.text = score.ToString();
         else if (team == 2) secondTeamScoreText.text = score.ToString();

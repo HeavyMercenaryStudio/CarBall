@@ -17,7 +17,7 @@ public class NetSending : NetworkBehaviour {
         lastPos = transform.position;
         lastRot = transform.rotation;
         //transform.position = Vector3.Lerp(lastPos,syncedPos,lerpMove*Time.deltaTime);
-        transform.position = Vector3.MoveTowards(lastPos, syncedPos, stepMove*Time.deltaTime);
+        transform.position = Vector3.MoveTowards(lastPos, syncedPos, stepMove);
         transform.rotation = Quaternion.Lerp(lastRot, syncedRotation, stepRotation * Time.deltaTime);
     }
 

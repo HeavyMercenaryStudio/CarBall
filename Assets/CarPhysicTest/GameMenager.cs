@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class GameMenager : MonoBehaviour {
+[NetworkSettings(channel =0,sendInterval =0.1f)]
+public class GameMenager : NetworkBehaviour {
 
     [SerializeField] int matchTimeInMinutes;
 
@@ -22,13 +24,13 @@ public class GameMenager : MonoBehaviour {
 	void Start () {
 
         UI = GetComponent<GameUI>();
-
         firstTeamGoalGate.notifyGoalScored += FirstTeamScored;
         secondTeamGoalGate.notifyGoalScored += SecondTeamScored;
 
-        StartCoroutine(MatchStart());
+        
+            StartCoroutine(MatchStart());
     }
-
+    [Server]
     private IEnumerator MatchStart()
     {
         currentMinutes = matchTimeInMinutes - 1;
@@ -38,7 +40,6 @@ public class GameMenager : MonoBehaviour {
         while (true)
         {
             UI.SetMatchTime(currentMinutes, currentSeconds);
-
             currentSeconds--;
             if(currentSeconds == 0){
                 currentSeconds = 59;
@@ -52,36 +53,50 @@ public class GameMenager : MonoBehaviour {
 
             yield return new WaitForSeconds(1);
         }
-
     }
 
+    [Server]
     private void MatchEnd()
     {
+        int winner = 0;
         Time.timeScale = 0;
 
-        int winner = 0;
+            
         if (firstTeamScore > secondTeamScore) winner = 1;
         else if (secondTeamScore > firstTeamScore) winner = 2;
-
+        RpcSetWinnerPanel(winner);
         UI.SetWinnerPanel(winner);
+        
+
     }
 
+    [ClientRpc]
+    void RpcSetWinnerPanel(int winner)
+    {
+        UI.SetWinnerPanel(winner);
+    }
+    [Server]
     private void SecondTeamScored()
     {
         secondTeamScore++;
         UI.SetTeamScore(secondTeamScore, 2);
         GoalScored();
+        Debug.Log("Second: "+secondTeamScore);
     }
-
+    [Server]
     private void FirstTeamScored()
     {
         firstTeamScore++;
         UI.SetTeamScore(firstTeamScore, 1);
         GoalScored();
+        Debug.Log("First: " + firstTeamScore);
     }
-
+ 
+    [Server]
     private void GoalScored()
     {
+        //if (!Network.isServer)
+        //    return;
         ball.transform.position = new Vector3(0, 3, 0);
         ball.velocity = Vector3.zero;
         ball.isKinematic = true;
