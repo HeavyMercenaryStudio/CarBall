@@ -30,9 +30,26 @@ public class SpeedPlatform : NetworkBehaviour {
         var car = other.GetComponent<CarController>();
         if (car)
         {
-            car.CurrentBoost += (speedPercentageAmount/car.MaxBoost) * car.MaxBoost;
+            //car.CurrentBoost += (speedPercentageAmount/car.MaxBoost) * car.MaxBoost;
+            //Debug.Log(car.GetComponent<NetworkIdentity>().netId);
+            RpcUpdateBoost(car.netId);
             RpcStartCoroutine();
             StartCoroutine(RespawnBoost());
+        }
+    }
+ 
+    [ClientRpc]
+    private void RpcUpdateBoost(NetworkInstanceId netId)
+    {
+        //if()
+        var list = FindObjectsOfType<CarController>();
+        for (int i = 0; i < list.Length; i++)
+        {
+            if(list[i].netId==netId)
+            {
+                list[i].CurrentBoost += (speedPercentageAmount / list[i].MaxBoost) * list[i].MaxBoost;
+                break;
+            }
         }
     }
 

@@ -26,10 +26,19 @@ public class GameMenager : NetworkBehaviour {
         UI = GetComponent<GameUI>();
         firstTeamGoalGate.notifyGoalScored += FirstTeamScored;
         secondTeamGoalGate.notifyGoalScored += SecondTeamScored;
-
+        Debug.Log(netId);
+        StartTime();
         
-            StartCoroutine(MatchStart());
     }
+
+
+
+    [Server]
+    void StartTime()
+    {
+        StartCoroutine(MatchStart());
+    }
+
     [Server]
     private IEnumerator MatchStart()
     {
@@ -59,13 +68,11 @@ public class GameMenager : NetworkBehaviour {
     private void MatchEnd()
     {
         int winner = 0;
-        Time.timeScale = 0;
 
             
         if (firstTeamScore > secondTeamScore) winner = 1;
         else if (secondTeamScore > firstTeamScore) winner = 2;
         RpcSetWinnerPanel(winner);
-        UI.SetWinnerPanel(winner);
         
 
     }
@@ -74,7 +81,19 @@ public class GameMenager : NetworkBehaviour {
     void RpcSetWinnerPanel(int winner)
     {
         UI.SetWinnerPanel(winner);
+        StartCoroutine(BackToLobby());
+        //Time.timeScale = 0;
+
+        //lobby.ServerChangeScene(lobby.playScene);
     }
+
+    private IEnumerator BackToLobby()
+    {
+        yield return new WaitForSeconds(2);
+        var lobby = FindObjectOfType<NetworkLobbyManager>();
+        lobby.ServerReturnToLobby();
+    }
+
     [Server]
     private void SecondTeamScored()
     {

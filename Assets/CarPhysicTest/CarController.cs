@@ -14,9 +14,10 @@ public class CarController : NetworkBehaviour {
     [SerializeField] float kickForce;
 
     Rigidbody rigibody;
-    [SyncVar(hook = "OnChangeBoost")]
+    //[SyncVar(hook = "OnChangeBoost")]
     float currentBoost;
     float currentCarSpeed;
+
     public float CurrentBoost
     {
         get {
@@ -24,7 +25,8 @@ public class CarController : NetworkBehaviour {
         }
         set {
             currentBoost = Mathf.Clamp(value, 0, maxBoost);
-            UI.SetEnergyBarValue(currentBoost / maxBoost);
+            if(isLocalPlayer)
+                UI.SetEnergyBarValue(currentBoost / maxBoost);
         }
     }
     public float MaxBoost
@@ -32,34 +34,34 @@ public class CarController : NetworkBehaviour {
 
 
 
-    CarUI UI;
+    public CarUI UI;
     // Use this for initialization
     void Start () {
         rigibody = GetComponent<Rigidbody>();
+        UI = FindObjectOfType<CarUI>();
+        currentBoost = maxBoost;
+        currentCarSpeed = carSpeed;
+        Debug.Log(netId);
         if (!isLocalPlayer)
             return;
 
         //UI = FindObjectOfType<CarUI>();
-        UI = FindObjectOfType<CarUI>();
+        
         UI.energyBar = GameObject.FindGameObjectWithTag("BoostPointer").GetComponent<Image>();
         //Image boostFill= GameObject.FindGameObjectWithTag("BoostPointer").GetComponent<Image>();
         //Image boostFill = GameObject.Find("CircleFill").GetComponent<Image>();
         //if (boostFill != null)
         //    UI.energyBar = boostFill;
-        currentBoost = maxBoost;
-        currentCarSpeed = carSpeed;
+
     }
 
-    void OnChangeBoost(float boost)
-    {
-        UI.SetEnergyBarValue(boost / maxBoost);
-    }
 
     // Update is called once per frame
     void Update ()
     {
         if (!isLocalPlayer)
             return;
+        //Debug.Log(currentBoost);
         Move();
         SpeedBoost();
     }
