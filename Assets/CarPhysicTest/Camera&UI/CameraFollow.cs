@@ -18,15 +18,25 @@ namespace CameraUI {
 
         Vector3 moveVelocity; //Veclocity of camera
 
+        public Transform Player
+        {
+            get {
+                return player;
+            }
+
+            set {
+                player = value;
+            }
+        }
+
         void FixedUpdate(){
             Move ();
 	    }
 
         public void Move()
         {
-
             //follow this position
-            transform.position = Vector3.SmoothDamp (transform.position, player.position, ref moveVelocity, smoothTime);
+            transform.position = Vector3.SmoothDamp (transform.position, Player.position, ref moveVelocity, smoothTime);
         }
     }
 }
