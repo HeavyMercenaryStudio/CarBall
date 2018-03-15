@@ -1,11 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
 
-[NetworkSettings(channel =0,sendInterval =0.1f)]
-public class CarController : NetworkBehaviour {
+public class CarController : MonoBehaviour {
 
     [SerializeField] float maxBoost;
     [SerializeField] float carSpeed;
@@ -14,10 +11,8 @@ public class CarController : NetworkBehaviour {
     [SerializeField] float kickForce;
 
     Rigidbody rigibody;
-    //[SyncVar(hook = "OnChangeBoost")]
     float currentBoost;
     float currentCarSpeed;
-
     public float CurrentBoost
     {
         get {
@@ -25,43 +20,25 @@ public class CarController : NetworkBehaviour {
         }
         set {
             currentBoost = Mathf.Clamp(value, 0, maxBoost);
-            if(isLocalPlayer)
-                UI.SetEnergyBarValue(currentBoost / maxBoost);
+            UI.SetEnergyBarValue(currentBoost / maxBoost);
         }
     }
     public float MaxBoost
     { get { return maxBoost; } }
 
-
-
-    public CarUI UI;
+    CarUI UI;
     // Use this for initialization
     void Start () {
         rigibody = GetComponent<Rigidbody>();
-        UI = FindObjectOfType<CarUI>();
+        UI = GetComponent<CarUI>();
+
         currentBoost = maxBoost;
         currentCarSpeed = carSpeed;
-        Debug.Log(netId);
-        if (!isLocalPlayer)
-            return;
-
-        //UI = FindObjectOfType<CarUI>();
-        
-        UI.energyBar = GameObject.FindGameObjectWithTag("BoostPointer").GetComponent<Image>();
-        //Image boostFill= GameObject.FindGameObjectWithTag("BoostPointer").GetComponent<Image>();
-        //Image boostFill = GameObject.Find("CircleFill").GetComponent<Image>();
-        //if (boostFill != null)
-        //    UI.energyBar = boostFill;
-
     }
-
-
-    // Update is called once per frame
-    void Update ()
+	
+	// Update is called once per frame
+	void Update ()
     {
-        if (!isLocalPlayer)
-            return;
-        //Debug.Log(currentBoost);
         Move();
         SpeedBoost();
     }
@@ -103,22 +80,12 @@ public class CarController : NetworkBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        if (!isLocalPlayer)
-            return;
-        if (collision.gameObject.layer == Layers.BALL)
+        if(collision.gameObject.layer == Layers.BALL)
         {
             var ball = collision.gameObject.GetComponent<Rigidbody>();
             var force = transform.forward * kickForce;
-            if(isServer)
-                rigibody.AddForce(force);
-            CmdHitBall(force, ball.gameObject);
+            ball.AddForce(force);
+            ball.AddTorque(force);
         }
-    }
-
-    [Command]
-    void CmdHitBall(Vector3 force, GameObject ball)
-    {
-        rigibody.AddForce(force);
-
     }
 }
