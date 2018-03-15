@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class CarUI : MonoBehaviour {
 
-    [SerializeField] Image energyBar;
+    public Image energyBar;
 
 
     public void SetEnergyBarValue(float energy)

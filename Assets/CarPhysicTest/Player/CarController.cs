@@ -28,7 +28,7 @@ public class CarController : NetworkBehaviour {
         }
         set {
             currentBoost = Mathf.Clamp(value, 0, maxBoostEnergy);
-            UI.SetEnergyBarValue(currentBoost / maxBoostEnergy);
+            if (isLocalPlayer) UI.SetEnergyBarValue(currentBoost / maxBoostEnergy);
         }
     }
     public float MaxBoost
@@ -42,11 +42,19 @@ public class CarController : NetworkBehaviour {
 
         currentBoost = maxBoostEnergy;
         currentCarAccel = carNormalAccel;
+
+        if (!isLocalPlayer)
+            return;
+
+        UI.energyBar = GameObject.FindGameObjectWithTag("BoostPointer").GetComponent<Image>();
     }
 	
 	// Update is called once per frame
 	void FixedUpdate ()
     {
+        if (!isLocalPlayer)
+            return;
+
         Move();
     }
    
@@ -104,11 +112,14 @@ public class CarController : NetworkBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.layer == Layers.BALL)
+        if (!isLocalPlayer)
+            return;
+
+        if (collision.gameObject.layer == Layers.BALL)
         {
             var ball = collision.gameObject.GetComponent<Rigidbody>();
             var force = rigibody.velocity * kickForce;
-            ball.AddForce(force);
+            if (isServer)  ball.AddForce(force);
             
             CmdHitBall(force, ball.gameObject);
         }
