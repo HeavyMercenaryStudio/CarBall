@@ -1,15 +1,18 @@
-﻿using System.Collections;
+﻿using Game.Utility;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapEdge : MonoBehaviour {
+namespace Game.Core { 
+    public class MapEdge : MonoBehaviour {
 
-	void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject.layer == Layers.PLAYER)
+	    void OnTriggerEnter(Collider other)
         {
-            //Reset position
-        }
+            if(other.gameObject.layer == Layers.PLAYER)
+            {
+                //Reset position
+            }
 
+        }
     }
 }

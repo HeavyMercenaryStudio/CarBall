@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CarUI : MonoBehaviour {
+namespace Game.UI { 
+    public class CarUI : MonoBehaviour {
 
-    public Image energyBar;
+        [HideInInspector]
+        public Image energyBar;
 
+        public void Start(){
+            energyBar = FindObjectOfType<SpeedUICircleFillImage>().GetComponent<Image>();
+        }
 
-    public void SetEnergyBarValue(float energy)
-    {
-        energyBar.fillAmount = energy;
+        public void SetEnergyBarValue(float energy)
+        {
+            energyBar.fillAmount = energy;
+        }
+
     }
-
 }

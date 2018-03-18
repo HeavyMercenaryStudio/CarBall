@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Game.Utility;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+namespace Game.Core { 
 public class GoalGate : NetworkBehaviour {
 
     public delegate void OnGoalScored();
@@ -31,6 +33,5 @@ public class GoalGate : NetworkBehaviour {
         }
 
     }
-
-   
+}
 }

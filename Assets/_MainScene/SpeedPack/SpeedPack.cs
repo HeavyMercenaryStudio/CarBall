@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Game.Car;
+using Game.Utility;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+namespace Game.Core { 
 public class SpeedPack : NetworkBehaviour {
 
     [SerializeField] float speedPercentageAmount;
@@ -30,8 +33,6 @@ public class SpeedPack : NetworkBehaviour {
         var car = other.GetComponent<CarController>();
         if (car)
         {
-            //car.CurrentBoost += (speedPercentageAmount/car.MaxBoost) * car.MaxBoost;
-            //Debug.Log(car.GetComponent<NetworkIdentity>().netId);
             RpcUpdateBoost(car.netId);
             RpcStartCoroutine();
             StartCoroutine(RespawnBoost());
@@ -41,7 +42,6 @@ public class SpeedPack : NetworkBehaviour {
     [ClientRpc]
     private void RpcUpdateBoost(NetworkInstanceId netId)
     {
-        //if()
         var list = FindObjectsOfType<CarController>();
         for (int i = 0; i < list.Length; i++)
         {
@@ -56,7 +56,6 @@ public class SpeedPack : NetworkBehaviour {
     [ClientRpc]
     private void RpcStartCoroutine()
     {
-        Debug.Log("Odpalony");
         StartCoroutine(RespawnBoost());
     }
 
@@ -72,4 +71,5 @@ public class SpeedPack : NetworkBehaviour {
     void Start(){
         particle = GetComponentInChildren<ParticleSystem>();
     }
+}
 }

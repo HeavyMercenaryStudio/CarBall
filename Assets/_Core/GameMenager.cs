@@ -1,124 +1,110 @@
-﻿using System;
+﻿using Game.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[NetworkSettings(channel =0,sendInterval =0.1f)]
-public class GameMenager : NetworkBehaviour {
+namespace Game.Core { 
+    [NetworkSettings(channel =0,sendInterval =0.1f)]
+    public class GameMenager : NetworkBehaviour {
 
-    [SerializeField] int matchTimeInMinutes;
+        [SerializeField] int matchTimeInMinutes;
+        [SerializeField] GoalGate firstTeamGoalGate;
+        [SerializeField] GoalGate secondTeamGoalGate;
+        [SerializeField] Rigidbody ball;
 
-    [SerializeField] GoalGate firstTeamGoalGate;
-    [SerializeField] GoalGate secondTeamGoalGate;
-    [SerializeField] Rigidbody ball;
+        GameUI UI;
+        int firstTeamScore;
+        int secondTeamScore;
 
-    GameUI UI;
-    int firstTeamScore;
-    int secondTeamScore;
+        int currentMinutes;
+        int currentSeconds;
 
-    int currentMinutes;
-    int currentSeconds;
+	    // Use this for initialization
+	    void Start () {
 
-	// Use this for initialization
-	void Start () {
-
-        UI = GetComponent<GameUI>();
-        firstTeamGoalGate.notifyGoalScored += FirstTeamScored;
-        secondTeamGoalGate.notifyGoalScored += SecondTeamScored;
-        Debug.Log(netId);
-        StartTime();
-        
-    }
-
-
-
-    [Server]
-    void StartTime()
-    {
-        StartCoroutine(MatchStart());
-    }
-
-    [Server]
-    private IEnumerator MatchStart()
-    {
-        currentMinutes = matchTimeInMinutes - 1;
-        currentSeconds = 59;
-        UI.SetMatchTime(currentMinutes, currentSeconds);
-
-        while (true)
-        {
-            UI.SetMatchTime(currentMinutes, currentSeconds);
-            currentSeconds--;
-            if(currentSeconds == 0){
-                currentSeconds = 59;
-                currentMinutes--;
-            }
-
-            if (currentMinutes < 0){
-                MatchEnd();
-                yield return null;
-            }
-
-            yield return new WaitForSeconds(1);
+            UI = GetComponent<GameUI>();
+            firstTeamGoalGate.notifyGoalScored += FirstTeamScored;
+            secondTeamGoalGate.notifyGoalScored += SecondTeamScored;
+            StartTime();
         }
-    }
 
-    [Server]
-    private void MatchEnd()
-    {
-        int winner = 0;
+        [Server]
+        void StartTime(){
+            StartCoroutine(MatchStart());
+        }
 
-            
-        if (firstTeamScore > secondTeamScore) winner = 1;
-        else if (secondTeamScore > firstTeamScore) winner = 2;
-        RpcSetWinnerPanel(winner);
-        
+        [Server]
+        private IEnumerator MatchStart()
+        {
+            currentMinutes = matchTimeInMinutes - 1;
+            currentSeconds = 59;
+            UI.SetMatchTime(currentMinutes, currentSeconds);
 
-    }
+            while (true)
+            {
+                UI.SetMatchTime(currentMinutes, currentSeconds);
+                currentSeconds--;
+                if(currentSeconds == 0){
+                    currentSeconds = 59;
+                    currentMinutes--;
+                }
 
-    [ClientRpc]
-    void RpcSetWinnerPanel(int winner)
-    {
-        UI.SetWinnerPanel(winner);
-        StartCoroutine(BackToLobby());
-        //Time.timeScale = 0;
+                if (currentMinutes < 0){
+                    MatchEnd();
+                    yield return null;
+                }
 
-        //lobby.ServerChangeScene(lobby.playScene);
-    }
+                yield return new WaitForSeconds(1);
+            }
+        }
 
-    private IEnumerator BackToLobby()
-    {
-        yield return new WaitForSeconds(2);
-        var lobby = FindObjectOfType<NetworkLobbyManager>();
-        lobby.ServerReturnToLobby();
-    }
+        [Server]
+        private void MatchEnd(){
 
-    [Server]
-    private void SecondTeamScored()
-    {
-        secondTeamScore++;
-        UI.SetTeamScore(secondTeamScore, 2);
-        GoalScored();
-        Debug.Log("Second: "+secondTeamScore);
-    }
-    [Server]
-    private void FirstTeamScored()
-    {
-        firstTeamScore++;
-        UI.SetTeamScore(firstTeamScore, 1);
-        GoalScored();
-        Debug.Log("First: " + firstTeamScore);
-    }
+            int winner = 0;
+            if (firstTeamScore > secondTeamScore) winner = 1;
+            else if (secondTeamScore > firstTeamScore) winner = 2;
+            RpcSetWinnerPanel(winner);
+        }
+
+        [ClientRpc]
+        void RpcSetWinnerPanel(int winner)
+        {
+            UI.SetWinnerPanel(winner);
+            StartCoroutine(BackToLobby());
+        }
+
+        private IEnumerator BackToLobby()
+        {
+            yield return new WaitForSeconds(2);
+            var lobby = FindObjectOfType<NetworkLobbyManager>();
+            lobby.ServerReturnToLobby();
+        }
+
+        [Server]
+        private void SecondTeamScored()
+        {
+            secondTeamScore++;
+            UI.SetTeamScore(secondTeamScore, 2);
+            GoalScored();
+        }
+        [Server]
+        private void FirstTeamScored()
+        {
+            firstTeamScore++;
+            UI.SetTeamScore(firstTeamScore, 1);
+            GoalScored();
+        }
  
-    [Server]
-    private void GoalScored()
-    {
-        //if (!Network.isServer)
-        //    return;
-        ball.transform.position = new Vector3(0, 3, 0);
-        ball.velocity = Vector3.zero;
-        ball.isKinematic = true;
-        ball.isKinematic = false;
+        [Server]
+        private void GoalScored()
+        {
+            ball.transform.position = new Vector3(0, 3, 0);
+            ball.velocity = Vector3.zero;
+            ball.isKinematic = true;
+            ball.isKinematic = false;
+        }
     }
 }
