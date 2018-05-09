@@ -101,7 +101,7 @@ namespace Game.Core {
         [Server]
         private void GoalScored()
         {
-            ball.transform.position = new Vector3(0, 3, 0);
+            ball.transform.position = new Vector3(0, 7, 0);
             ball.velocity = Vector3.zero;
             ball.isKinematic = true;
             ball.isKinematic = false;
