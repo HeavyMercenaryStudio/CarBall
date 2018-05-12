@@ -21,6 +21,8 @@ namespace Game.Car {
         [SerializeField] float maxBoostEnergy;
         [SerializeField] ParticleSystem boostParticle;
 
+        [SerializeField] Material carColorMaterial;
+
         Rigidbody rigibody;
         float currentBoost;
         float currentCarAccel;
@@ -56,6 +58,7 @@ namespace Game.Car {
                 camera.Player = this.transform;
             }
 
+            SetCarColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)));
         }
 	
 	    // Update is called once per frame
@@ -169,6 +172,12 @@ namespace Game.Car {
         void CmdHitBall(Vector3 force, GameObject ball)
         {
             rigibody.AddForce(force);
+        }
+
+
+        public void SetCarColor(Color c)
+        {
+            carColorMaterial.color = c;
         }
     }
 }

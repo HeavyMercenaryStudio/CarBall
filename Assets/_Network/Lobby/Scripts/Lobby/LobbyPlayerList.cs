@@ -11,8 +11,6 @@ namespace Prototype.NetworkLobby
         public static LobbyPlayerList _instance = null;
 
         public RectTransform playerListContentTransform;
-        public GameObject warningDirectPlayServer;
-        public Transform addButtonRow;
 
         protected VerticalLayoutGroup _layout;
         protected List<LobbyPlayer> _players = new List<LobbyPlayer>();
@@ -21,12 +19,6 @@ namespace Prototype.NetworkLobby
         {
             _instance = this;
             _layout = playerListContentTransform.GetComponent<VerticalLayoutGroup>();
-        }
-
-        public void DisplayDirectServerWarning(bool enabled)
-        {
-            if(warningDirectPlayServer != null)
-                warningDirectPlayServer.SetActive(enabled);
         }
 
         void Update()
@@ -46,25 +38,13 @@ namespace Prototype.NetworkLobby
             _players.Add(player);
 
             player.transform.SetParent(playerListContentTransform, false);
-            addButtonRow.transform.SetAsLastSibling();
 
-            PlayerListModified();
         }
 
         public void RemovePlayer(LobbyPlayer player)
         {
             _players.Remove(player);
-            PlayerListModified();
         }
 
-        public void PlayerListModified()
-        {
-            int i = 0;
-            foreach (LobbyPlayer p in _players)
-            {
-                p.OnPlayerListChanged(i);
-                ++i;
-            }
-        }
     }
 }

@@ -8,9 +8,7 @@ namespace Prototype.NetworkLobby
     public class LobbyMainMenu : MonoBehaviour 
     {
         public LobbyManager lobbyManager;
-
         public RectTransform lobbyPanel;
-
         public InputField ipInput;
 
         public void OnEnable()
@@ -19,7 +17,6 @@ namespace Prototype.NetworkLobby
 
             ipInput.onEndEdit.RemoveAllListeners();
             ipInput.onEndEdit.AddListener(onEndEditIP);
-
         }
 
         public void OnClickHost()
@@ -35,7 +32,6 @@ namespace Prototype.NetworkLobby
             lobbyManager.StartClient();
 
             lobbyManager.backDelegate = lobbyManager.StopClientClbk;
-            lobbyManager.DisplayIsConnecting();
 
             lobbyManager.SetServerInfo("Connecting...", lobbyManager.networkAddress);
         }
