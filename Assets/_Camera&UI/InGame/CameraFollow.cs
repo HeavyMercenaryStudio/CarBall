@@ -36,6 +36,7 @@ namespace Game.UI {
         public void Move()
         {
             //follow this position
+            if(Player)
                 transform.position = Vector3.SmoothDamp (transform.position, Player.position, ref moveVelocity, smoothTime);
         }
     }

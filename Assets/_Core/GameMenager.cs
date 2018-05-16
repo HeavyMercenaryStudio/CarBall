@@ -14,6 +14,8 @@ namespace Game.Core {
         [SerializeField] GoalGate secondTeamGoalGate;
         [SerializeField] Rigidbody ball;
 
+        public Car.CarController LocalCar;
+
         GameUI UI;
         int firstTeamScore;
         int secondTeamScore;
@@ -21,6 +23,17 @@ namespace Game.Core {
         int currentMinutes;
         int currentSeconds;
 
+        private static GameMenager instance;
+        public static GameMenager Instance
+        {
+            get { return instance; }
+        }
+
+        void Awake()
+        {
+            if (instance == null) instance = this;
+            else Destroy(instance.gameObject);
+        }
 	    // Use this for initialization
 	    void Start () {
 
@@ -105,6 +118,31 @@ namespace Game.Core {
             ball.velocity = Vector3.zero;
             ball.isKinematic = true;
             ball.isKinematic = false;
+
+            StartCoroutine(PauseGame());
+            RpcPauseGame();
+        }
+
+        [ClientRpc]
+        void RpcPauseGame(){
+            StartCoroutine(PauseGame());
+        }
+
+        IEnumerator PauseGame()
+        {
+            LocalCar.enabled = false;
+            yield return new WaitForSeconds(2f);
+
+            var list = FindObjectsOfType<Car.CarController>();
+            for (int i = 0; i < list.Length; i++)
+            {
+                var positions = FindObjectsOfType<NetworkStartPosition>();
+                var pos = positions[i];
+                list[i].transform.position = pos.transform.position;
+                break;
+            }
+            LocalCar.enabled = true;
+            UI.DisableText();
         }
     }
 }

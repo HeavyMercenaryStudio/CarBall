@@ -46,7 +46,6 @@ namespace Prototype.NetworkLobby
             lobbyManager.SetServerInfo("Dedicated Server", lobbyManager.networkAddress);
         }
 
-
         void onEndEditIP(string text)
         {
             if (Input.GetKeyDown(KeyCode.Return))

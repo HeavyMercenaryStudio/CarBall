@@ -15,7 +15,15 @@ namespace Game.UI {
         [SerializeField] Text secondTeamScoreText;
         [SerializeField] Text matchEndText;
 
+        [Header("Nav")]
+        [SerializeField] Image ballArrow;
+
         void Start()
+        {
+            matchEndText.gameObject.SetActive(false);
+        }
+
+        public void DisableText()
         {
             matchEndText.gameObject.SetActive(false);
         }
@@ -33,18 +41,31 @@ namespace Game.UI {
 
         public void SetTeamScore(int score, int team)
         {
-            if (team == 1)
-                firstTeamScoreText.text = score.ToString();
-            else if(team == 2)
-                secondTeamScoreText.text = score.ToString();
+            SetScoreForTeam(score, team);
 
             RpcSetTeamScore(score, team);
         }
+
         [ClientRpc]
-        void RpcSetTeamScore(int score, int team)
+        void RpcSetTeamScore(int score, int team){
+            SetScoreForTeam(score, team);
+        }
+
+        private void SetScoreForTeam(int score, int team)
         {
-            if (team == 1) firstTeamScoreText.text = score.ToString();
-            else if (team == 2) secondTeamScoreText.text = score.ToString();
+            matchEndText.gameObject.SetActive(true);
+            if (team == 1)
+            {
+                firstTeamScoreText.text = score.ToString();
+                matchEndText.color = Color.red;
+                matchEndText.text = "RED TEAM SCORED";
+            }
+            else if (team == 2)
+            {
+                secondTeamScoreText.text = score.ToString();
+                matchEndText.color = Color.blue;
+                matchEndText.text = "BLUE TEAM SCORED";
+            }
         }
 
         public void SetWinnerPanel(int winnerTeam)

@@ -226,6 +226,7 @@ namespace Prototype.NetworkLobby
 
         }
 
+
         public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
         {
             //This hook allows you to apply state data from the lobby-player to the game-player
@@ -233,6 +234,11 @@ namespace Prototype.NetworkLobby
 
             if (_lobbyHooks)
                 _lobbyHooks.OnLobbyServerSceneLoadedForPlayer(this, lobbyPlayer, gamePlayer);
+
+            var carC = gamePlayer.GetComponent<Game.Car.CarController>();
+            var lobbyC = lobbyPlayer.GetComponent<LobbyPlayer>();
+            carC.playerColor = lobbyC.playerColor;
+            carC.playerName = lobbyC.playerName;
 
             return true;
         }
@@ -255,6 +261,7 @@ namespace Prototype.NetworkLobby
         public IEnumerator ServerCountdownCoroutine()
         {
             yield return new WaitForEndOfFrame();
+            mainMenuPanel.gameObject.SetActive(false);
             ServerChangeScene(playScene);
         }
 

@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Game.UI;
 using Game.Utility;
+using UnityEngine.UI;
+using System;
 
 namespace Game.Car { 
 
@@ -20,8 +22,9 @@ namespace Game.Car {
         [SerializeField] float kickForce;
         [SerializeField] float maxBoostEnergy;
         [SerializeField] ParticleSystem boostParticle;
-
+        [SerializeField] Text nameText;
         [SerializeField] Material carColorMaterial;
+        [SerializeField] GameObject ballArrow;
 
         Rigidbody rigibody;
         float currentBoost;
@@ -43,10 +46,15 @@ namespace Game.Car {
         // Use this for initialization
 
         float dist;
+        private Renderer _renderer;
+        private MaterialPropertyBlock _propBlock;
+        private float lerpTime;
+        public GameObject ball;
 
         void Start () {
             rigibody = GetComponent<Rigidbody>();
             UI = FindObjectOfType<CarUI>();
+            StartCoroutine(FindBall());
 
             currentBoost = maxBoostEnergy;
             currentCarAccel = carNormalAccel;
@@ -56,13 +64,28 @@ namespace Game.Car {
             {
                 var camera = FindObjectOfType<CameraFollow>();
                 camera.Player = this.transform;
+                ballArrow.SetActive(true);
+                Game.Core.GameMenager.Instance.LocalCar = this;
             }
+            else
+                ballArrow.SetActive(false);
 
-            SetCarColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)));
+            SetCarColor();
+            SetCarName();
         }
-	
-	    // Update is called once per frame
-	    void FixedUpdate ()
+
+        private IEnumerator FindBall()
+        {
+            while(ball == null){
+                yield return new WaitForEndOfFrame();
+                ball = FindObjectOfType<Ball>().gameObject;
+            }
+        }
+
+
+
+        // Update is called once per frame
+        void FixedUpdate ()
         {
             if (!isLocalPlayer)
                 return;
@@ -72,20 +95,21 @@ namespace Game.Car {
    
         private void Move()
         {
+            SetBallArrow();
             Debug.Log(IsGrounded());
-
 
             if (!IsGrounded()) {
 
-                if(Input.GetKeyDown(KeyCode.R))
-                     transform.rotation = Quaternion.identity;
-
+                if (Input.GetButton("GetUp"))
+                {
+                    GetUp();
+                }
+                lerpTime = 0;
                 return;
-            } 
+            }
 
-
-                //Get input
-                float h = Input.GetAxis("Horizontal");
+            //Get input
+            float h = Input.GetAxis("Horizontal");
             float v = Input.GetAxis("Vertical");
 
             SpeedBoost(ref v);
@@ -113,6 +137,14 @@ namespace Game.Car {
 
             var pos = new Vector3(transform.position.x, transform.position.y + dist, transform.position.z);
             Debug.DrawRay(pos,-transform.up * distToGround);
+        }
+
+        private void GetUp()
+        {
+            lerpTime += Time.deltaTime * 10;
+            var from = transform.rotation;
+            var to = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+            transform.rotation = Quaternion.Lerp(from, to, lerpTime);
         }
 
         public float distToGround = 1;
@@ -168,6 +200,19 @@ namespace Game.Car {
         
         }
 
+        public void SetBallArrow(){
+
+            if (ball) {
+                var dist = Vector3.Distance(transform.position, ball.transform.position);
+                if (dist > 25){
+                    ballArrow.transform.LookAt(ball.transform);
+                    ballArrow.SetActive(true);
+                }
+                else
+                    ballArrow.SetActive(false);
+            }
+        }
+
         [Command]
         void CmdHitBall(Vector3 force, GameObject ball)
         {
@@ -175,9 +220,37 @@ namespace Game.Car {
         }
 
 
-        public void SetCarColor(Color c)
+        [SyncVar(hook = "OnColorChange")]
+        public Color playerColor;
+        public void OnColorChange(Color c) {
+            playerColor = c;
+        }
+        [SyncVar(hook = "OnNameChange")]
+        public string playerName;
+        public void OnNameChange(string s)
         {
-            carColorMaterial.color = c;
+            if (string.IsNullOrEmpty(s))
+                playerName = "Player" + netId;
+            else
+                playerName = s;
+        }
+        public void SetCarName()
+        {
+            nameText.text = playerName;
+        }
+        public void SetCarColor()
+        {
+            _propBlock = new MaterialPropertyBlock();
+            _renderer = GetComponentInChildren<Renderer>();
+
+            // Get the current value of the material properties in the renderer.
+            _renderer.GetPropertyBlock(_propBlock);
+
+            // Assign our new value.
+            _propBlock.SetColor("_CarColor", playerColor);
+
+            // Apply the edited values to the renderer.
+            _renderer.SetPropertyBlock(_propBlock);
         }
     }
 }

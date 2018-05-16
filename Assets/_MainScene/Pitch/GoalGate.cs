@@ -31,7 +31,6 @@ public class GoalGate : NetworkBehaviour {
         {
             notifyGoalScored();
         }
-
     }
 }
 }
