@@ -33,7 +33,6 @@ namespace Prototype.NetworkLobby
 
             lobbyManager.backDelegate = lobbyManager.StopClientClbk;
 
-            lobbyManager.SetServerInfo("Connecting...", lobbyManager.networkAddress);
         }
 
         public void OnClickDedicated()
@@ -42,8 +41,6 @@ namespace Prototype.NetworkLobby
             lobbyManager.StartServer();
 
             lobbyManager.backDelegate = lobbyManager.StopServerClbk;
-
-            lobbyManager.SetServerInfo("Dedicated Server", lobbyManager.networkAddress);
         }
 
         void onEndEditIP(string text)

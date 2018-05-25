@@ -13,19 +13,25 @@ namespace Game.UI {
         [Header("Scores")]
         [SerializeField] Text firstTeamScoreText;
         [SerializeField] Text secondTeamScoreText;
-        [SerializeField] Text matchEndText;
+        [SerializeField] Image matchEndImage;
 
-        [Header("Nav")]
-        [SerializeField] Image ballArrow;
+        [Header("UI Scores Images")]
+        [SerializeField] Sprite redScored;
+        [SerializeField] Sprite blueScored;
+
+        [Header("UI Game Images")]
+        [SerializeField] Sprite redWin;
+        [SerializeField] Sprite blueWin;
+        [SerializeField] Sprite draw;
 
         void Start()
         {
-            matchEndText.gameObject.SetActive(false);
+            matchEndImage.gameObject.SetActive(false);
         }
 
         public void DisableText()
         {
-            matchEndText.gameObject.SetActive(false);
+            matchEndImage.gameObject.SetActive(false);
         }
 
         public void SetMatchTime(int minutes, int seconds)
@@ -53,40 +59,29 @@ namespace Game.UI {
 
         private void SetScoreForTeam(int score, int team)
         {
-            matchEndText.gameObject.SetActive(true);
+            matchEndImage.gameObject.SetActive(true);
             if (team == 1)
             {
                 firstTeamScoreText.text = score.ToString();
-                matchEndText.color = Color.red;
-                matchEndText.text = "RED TEAM SCORED";
+                matchEndImage.sprite = blueScored;
             }
             else if (team == 2)
             {
                 secondTeamScoreText.text = score.ToString();
-                matchEndText.color = Color.blue;
-                matchEndText.text = "BLUE TEAM SCORED";
+                matchEndImage.sprite = redScored;
             }
         }
 
         public void SetWinnerPanel(int winnerTeam)
         {
-            matchEndText.gameObject.SetActive(true);
+            matchEndImage.gameObject.SetActive(true);
 
             if (winnerTeam == 1)
-            {
-                matchEndText.color = Color.blue;
-                matchEndText.text = "BLUE TEAM WIN";
-            }
+                matchEndImage.sprite = redWin;
             else if(winnerTeam == 2)
-            {
-                matchEndText.color = Color.red;
-                matchEndText.text = "RED TEAM WIN";
-            }
+                matchEndImage.sprite = blueWin;
             else
-            {
-                matchEndText.color = Color.white;
-                matchEndText.text = "DRAW";
-            }
+                matchEndImage.sprite = draw;
         }
     }
 }

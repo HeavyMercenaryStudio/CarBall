@@ -9,7 +9,7 @@ using System;
 
 namespace Game.Car { 
 
-    [NetworkSettings(channel = 0, sendInterval = 01f)]
+    [NetworkSettings(channel = 0, sendInterval = 0.1f)]
     public class CarController : NetworkBehaviour {
    
         [Header("Movement")]
@@ -43,15 +43,15 @@ namespace Game.Car {
         { get { return maxBoostEnergy; } }
 
         CarUI UI;
-        // Use this for initialization
 
         float dist;
         private Renderer _renderer;
         private MaterialPropertyBlock _propBlock;
         private float lerpTime;
         public GameObject ball;
+        public Vector3 startPosition;
 
-        void Start () {
+       void Start () {
             rigibody = GetComponent<Rigidbody>();
             UI = FindObjectOfType<CarUI>();
             StartCoroutine(FindBall());
@@ -65,7 +65,7 @@ namespace Game.Car {
                 var camera = FindObjectOfType<CameraFollow>();
                 camera.Player = this.transform;
                 ballArrow.SetActive(true);
-                Game.Core.GameMenager.Instance.LocalCar = this;
+                startPosition = transform.position;
             }
             else
                 ballArrow.SetActive(false);
@@ -96,7 +96,6 @@ namespace Game.Car {
         private void Move()
         {
             SetBallArrow();
-            Debug.Log(IsGrounded());
 
             if (!IsGrounded()) {
 
@@ -137,6 +136,11 @@ namespace Game.Car {
 
             var pos = new Vector3(transform.position.x, transform.position.y + dist, transform.position.z);
             Debug.DrawRay(pos,-transform.up * distToGround);
+        }
+
+        public void ResetPosition()
+        {
+            transform.position = startPosition;
         }
 
         private void GetUp()

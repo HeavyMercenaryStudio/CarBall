@@ -23,8 +23,7 @@ namespace Prototype.NetworkLobby
 
         public Button backButton;
 
-        public Text statusInfo;
-        public Text hostInfo;
+        public Image logo;
 
         //Client numPlayers from NetworkManager is always 0, so we count (throught connect/destroy in LobbyPlayer) the number
         //of players, so that even client know how many player there is.
@@ -45,8 +44,7 @@ namespace Prototype.NetworkLobby
             GetComponent<Canvas>().enabled = true;
 
             DontDestroyOnLoad(gameObject);
-
-            SetServerInfo("Offline", "None");
+            
         }
 
         public override void OnLobbyClientSceneChanged(NetworkConnection conn)
@@ -102,14 +100,7 @@ namespace Prototype.NetworkLobby
             else
             {
                 backButton.gameObject.SetActive(false);
-                SetServerInfo("Offline", "None");
             }
-        }
-
-        public void SetServerInfo(string status, string host)
-        {
-            statusInfo.text = status;
-            hostInfo.text = host;
         }
 
         public delegate void BackButtonDelegate();
@@ -161,7 +152,6 @@ namespace Prototype.NetworkLobby
 
             ChangeTo(lobbyPanel);
             backDelegate = StopHostClbk;
-            SetServerInfo("Hosting", networkAddress);
         }
 
         //allow to handle the (+) button to add/remove player
@@ -261,7 +251,7 @@ namespace Prototype.NetworkLobby
         public IEnumerator ServerCountdownCoroutine()
         {
             yield return new WaitForEndOfFrame();
-            mainMenuPanel.gameObject.SetActive(false);
+            
             ServerChangeScene(playScene);
         }
 
@@ -275,7 +265,6 @@ namespace Prototype.NetworkLobby
             {//only to do on pure client (not self hosting client)
                 ChangeTo(lobbyPanel);
                 backDelegate = StopClientClbk;
-                SetServerInfo("Client", networkAddress);
             }
         }
 

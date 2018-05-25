@@ -63,12 +63,8 @@ namespace Prototype.NetworkLobby
 
         void ChangeReadyButtonColor(Color c)
         {
-            ColorBlock b = readyButton.colors;
-            b.normalColor = c;
-            b.pressedColor = c;
-            b.highlightedColor = c;
-            b.disabledColor = c;
-            readyButton.colors = b;
+            var img = readyButton.GetComponentsInChildren<Image>();
+            img[1].color = c;
         }
 
         void SetupOtherPlayer()

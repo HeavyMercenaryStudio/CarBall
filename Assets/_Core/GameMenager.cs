@@ -16,6 +16,8 @@ namespace Game.Core {
 
         public Car.CarController LocalCar;
 
+        List<Car.CarController> cars = new List<Car.CarController>();
+
         GameUI UI;
         int firstTeamScore;
         int secondTeamScore;
@@ -23,24 +25,56 @@ namespace Game.Core {
         int currentMinutes;
         int currentSeconds;
 
-        private static GameMenager instance;
-        public static GameMenager Instance
+	    void Start ()
         {
-            get { return instance; }
-        }
-
-        void Awake()
-        {
-            if (instance == null) instance = this;
-            else Destroy(instance.gameObject);
-        }
-	    // Use this for initialization
-	    void Start () {
 
             UI = GetComponent<GameUI>();
             firstTeamGoalGate.notifyGoalScored += FirstTeamScored;
             secondTeamGoalGate.notifyGoalScored += SecondTeamScored;
+
+            DisableMainMenu();
+
+            FindLocalCar();
+
             StartTime();
+        }
+
+        //[Server]
+        //private void SetCarsStartPositions()
+        //{
+        //    var positions = FindObjectsOfType<NetworkStartPosition>();
+        //    LocalCar.startPosition = positions[0].transform.position;
+
+        //    for (int i = 1; i < cars.Count; i++)
+        //    {
+        //        var pos = positions[i];
+        //        RpcSetStartPosition(pos.transform.position);
+        //    }
+        //}
+        
+        //[ClientRpc]
+        //private void RpcSetStartPosition(Vector3 pos){
+        //    LocalCar.startPosition = pos;
+        //}
+
+        private static void DisableMainMenu()
+        {
+            var LM = FindObjectOfType<Prototype.NetworkLobby.LobbyManager>();
+            LM.mainMenuPanel.gameObject.SetActive(false);
+            LM.logo.gameObject.SetActive(false);
+        }
+
+        void FindLocalCar()
+        {
+            var list = FindObjectsOfType<Car.CarController>();
+            for (int i = 0; i < list.Length; i++)
+            {
+                cars.Add(list[i]);
+                if (list[i].isLocalPlayer)
+                    LocalCar = list[i];
+                break;
+            }
+
         }
 
         [Server]
@@ -130,17 +164,12 @@ namespace Game.Core {
 
         IEnumerator PauseGame()
         {
+            if (LocalCar == null)
+                FindLocalCar();
+
             LocalCar.enabled = false;
             yield return new WaitForSeconds(2f);
-
-            var list = FindObjectsOfType<Car.CarController>();
-            for (int i = 0; i < list.Length; i++)
-            {
-                var positions = FindObjectsOfType<NetworkStartPosition>();
-                var pos = positions[i];
-                list[i].transform.position = pos.transform.position;
-                break;
-            }
+            LocalCar.ResetPosition();
             LocalCar.enabled = true;
             UI.DisableText();
         }
