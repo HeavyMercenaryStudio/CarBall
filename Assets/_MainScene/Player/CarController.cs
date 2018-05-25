@@ -76,9 +76,11 @@ namespace Game.Car {
 
         private IEnumerator FindBall()
         {
-            while(ball == null){
+            while (ball == null)
+            {
                 yield return new WaitForEndOfFrame();
                 ball = FindObjectOfType<Ball>().gameObject;
+                Debug.Log(ball);
             }
         }
 
@@ -195,20 +197,23 @@ namespace Game.Car {
 
             if (collision.gameObject.layer == Layers.BALL)
             {
-                var ball = collision.gameObject.GetComponent<Rigidbody>();
+                var ballColl = collision.gameObject.GetComponent<Rigidbody>();
                 var force = rigibody.velocity * kickForce;
-                if (isServer)  ball.AddForce(force);
+                if (isServer) ballColl.AddForce(force);
             
-                CmdHitBall(force, ball.gameObject);
+                CmdHitBall(force, ballColl.gameObject);
             }
         
         }
 
-        public void SetBallArrow(){
+        public void SetBallArrow()
+        {
 
-            if (ball) {
+            if (ball)
+            {
                 var dist = Vector3.Distance(transform.position, ball.transform.position);
-                if (dist > 25){
+                if (dist > 25)
+                {
                     ballArrow.transform.LookAt(ball.transform);
                     ballArrow.SetActive(true);
                 }

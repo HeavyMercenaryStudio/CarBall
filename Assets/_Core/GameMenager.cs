@@ -66,15 +66,16 @@ namespace Game.Core {
 
         void FindLocalCar()
         {
-            var list = FindObjectsOfType<Car.CarController>();
+            var list = FindObjectsOfType<Game.Car.CarController>();
             for (int i = 0; i < list.Length; i++)
             {
                 cars.Add(list[i]);
                 if (list[i].isLocalPlayer)
+                {
                     LocalCar = list[i];
-                break;
+                    break;
+                }
             }
-
         }
 
         [Server]
@@ -166,7 +167,6 @@ namespace Game.Core {
         {
             if (LocalCar == null)
                 FindLocalCar();
-
             LocalCar.enabled = false;
             yield return new WaitForSeconds(2f);
             LocalCar.ResetPosition();
