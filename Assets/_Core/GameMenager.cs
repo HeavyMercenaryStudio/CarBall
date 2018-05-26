@@ -149,11 +149,10 @@ namespace Game.Core {
         [Server]
         private void GoalScored()
         {
-            ball.transform.position = new Vector3(0, 7, 0);
+            ball.transform.position = new Vector3(0, 9.43f, -2.95f);
             ball.velocity = Vector3.zero;
             ball.isKinematic = true;
             ball.isKinematic = false;
-
             StartCoroutine(PauseGame());
             RpcPauseGame();
         }
@@ -169,9 +168,11 @@ namespace Game.Core {
                 FindLocalCar();
             LocalCar.enabled = false;
             yield return new WaitForSeconds(2f);
+
             LocalCar.ResetPosition();
             LocalCar.enabled = true;
             UI.DisableText();
+
         }
     }
 }
