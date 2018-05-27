@@ -66,15 +66,16 @@ namespace Game.Core {
 
         void FindLocalCar()
         {
-            var list = FindObjectsOfType<Car.CarController>();
+            var list = FindObjectsOfType<Game.Car.CarController>();
             for (int i = 0; i < list.Length; i++)
             {
                 cars.Add(list[i]);
                 if (list[i].isLocalPlayer)
+                {
                     LocalCar = list[i];
-                break;
+                    break;
+                }
             }
-
         }
 
         [Server]
@@ -148,11 +149,10 @@ namespace Game.Core {
         [Server]
         private void GoalScored()
         {
-            ball.transform.position = new Vector3(0, 7, 0);
+            ball.transform.position = new Vector3(0, 9.43f, -2.95f);
             ball.velocity = Vector3.zero;
             ball.isKinematic = true;
             ball.isKinematic = false;
-
             StartCoroutine(PauseGame());
             RpcPauseGame();
         }
@@ -166,12 +166,13 @@ namespace Game.Core {
         {
             if (LocalCar == null)
                 FindLocalCar();
-
             LocalCar.enabled = false;
             yield return new WaitForSeconds(2f);
+
             LocalCar.ResetPosition();
             LocalCar.enabled = true;
             UI.DisableText();
+
         }
     }
 }
