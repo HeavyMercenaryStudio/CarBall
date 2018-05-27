@@ -68,8 +68,10 @@ namespace Game.Car {
                 startPosition = transform.position;
             }
             else
+            {
                 ballArrow.SetActive(false);
-
+                GetComponent<AudioSource>().enabled = true;
+            }
             SetCarColor();
             SetCarName();
         }
@@ -202,6 +204,8 @@ namespace Game.Car {
                 if (isServer) ballColl.AddForce(force);
             
                 CmdHitBall(force, ballColl.gameObject);
+
+                SoundManager.Instance.PlayPunchSound();
             }
         
         }

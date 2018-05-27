@@ -27,7 +27,6 @@ namespace Game.Core {
 
 	    void Start ()
         {
-
             UI = GetComponent<GameUI>();
             firstTeamGoalGate.notifyGoalScored += FirstTeamScored;
             secondTeamGoalGate.notifyGoalScored += SecondTeamScored;
@@ -167,6 +166,7 @@ namespace Game.Core {
             if (LocalCar == null)
                 FindLocalCar();
             LocalCar.enabled = false;
+            SoundManager.Instance.PlayWhistleSound();
             yield return new WaitForSeconds(2f);
 
             LocalCar.ResetPosition();
