@@ -93,7 +93,6 @@ namespace Game.Car {
         {
             if (!isLocalPlayer)
                 return;
-
             Move();
         }
    
