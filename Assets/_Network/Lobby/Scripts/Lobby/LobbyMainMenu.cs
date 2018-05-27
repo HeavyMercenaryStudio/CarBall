@@ -10,6 +10,12 @@ namespace Prototype.NetworkLobby
         public LobbyManager lobbyManager;
         public RectTransform lobbyPanel;
         public InputField ipInput;
+        public Text IpText;
+
+        void Start()
+        {
+            IpText.text = "IP: " + Network.player.ipAddress;
+        }
 
         public void OnEnable()
         {

@@ -38,6 +38,12 @@ namespace Game.Core {
             StartTime();
         }
 
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+                StartCoroutine(BackToLobby(0));
+        }
+
         //[Server]
         //private void SetCarsStartPositions()
         //{
@@ -120,12 +126,12 @@ namespace Game.Core {
         void RpcSetWinnerPanel(int winner)
         {
             UI.SetWinnerPanel(winner);
-            StartCoroutine(BackToLobby());
+            StartCoroutine(BackToLobby(2));
         }
 
-        private IEnumerator BackToLobby()
+        private IEnumerator BackToLobby(int time)
         {
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(time);
             var lobby = FindObjectOfType<NetworkLobbyManager>();
             lobby.ServerReturnToLobby();
         }
